@@ -1,10 +1,10 @@
 import dotenv from "dotenv";
 
-dotenv.config({ quiet: true });
+dotenv.config();
 
 export const ENV = {
     PORT: process.env.PORT,
-    DATABASE_URI: process.env.DATABASE_URI,
+    DATABASE_URL: process.env.DATABASE_URL,
     FRONTEND_URL: process.env.FRONTEND_URL,
     NODE_ENV: process.env.NODE_ENV,
     CLERK_PUBLISHABLE_KEY: process.env.CLERK_PUBLISHABLE_KEY,
