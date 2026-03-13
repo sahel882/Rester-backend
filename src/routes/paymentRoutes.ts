@@ -21,6 +21,9 @@ import {
 
 const router = Router()
 
+// Test
+router.get("/test-notification", testNotification)
+
 // Basic payments
 router.post("/", requireAuth(), createPayment)
 router.get("/user/:id", requireAuth(), getPaymentsByUser)
@@ -47,8 +50,5 @@ router.post("/payhere/webhook", payhereWebhook)
 router.post("/payout/request", requireAuth(), requestPayout)
 router.get("/payout/pending", requireAuth(), getPendingPayouts)
 router.put("/payout/:id/confirm", requireAuth(), confirmPayout)
-
-// Test
-router.get("/test-notification", testNotification)
 
 export default router;
