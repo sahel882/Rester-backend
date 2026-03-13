@@ -18,17 +18,24 @@ import disputeRoutes from './routes/disputeRoutes';
 import categoryRoutes from './routes/categoryRoutes';
 import { generalLimiter, paymentLimiter } from "./middleware/rateLimiter";
 
-
 const app = express();
 
-app.use(cors({ origin: ENV.FRONTEND_URL }));
+app.use(cors({
+    origin: [
+        "http://localhost:5173",
+        "http://localhost:8081",
+        "https://rester.lk",
+        "*"
+    ],
+    credentials: true
+}));
 app.use(clerkMiddleware())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(generalLimiter);
 
 app.get("/", (req, res) => {
-    res.json({message: "Welcome to Rester API",});
+    res.json({ message: "Welcome to Rester API" });
 });
 
 app.use("/api/users", userRoutes);
