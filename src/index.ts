@@ -16,6 +16,7 @@ import jobApplicationRoutes from './routes/jobApplicationRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import disputeRoutes from './routes/disputeRoutes';
 import categoryRoutes from './routes/categoryRoutes';
+import { generalLimiter, paymentLimiter } from "./middleware/rateLimiter";
 
 
 const app = express();
@@ -24,16 +25,10 @@ app.use(cors({ origin: ENV.FRONTEND_URL }));
 app.use(clerkMiddleware())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(generalLimiter);
 
 app.get("/", (req, res) => {
-    res.json({
-        message: "Welcome to Rester API",
-        endpoints: {
-            users: "/api/users",
-            products: "/api/gigs",
-            comments: "/api/comments"
-        },
-    })
+    res.json({message: "Welcome to Rester API",});
 });
 
 app.use("/api/users", userRoutes);
@@ -42,6 +37,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/payments", paymentLimiter);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/jobs", jobRoutes);
