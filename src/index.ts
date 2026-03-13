@@ -1,0 +1,54 @@
+import express from "express";
+import cors from "cors";
+import { ENV } from "./config/env";
+import { clerkMiddleware } from '@clerk/express';
+import userRoutes from './routes/userRoutes';
+import gigRoutes from './routes/gigRoutes';
+import orderRoutes from './routes/orderRoutes';
+import reviewRoutes from './routes/reviewRoutes';
+import conversationRoutes from './routes/conversationRoutes';
+import messageRoutes from './routes/messageRoutes';
+import paymentRoutes from './routes/paymentRoutes';
+import subscriptionRoutes from './routes/subscriptionRoutes';
+import jobRoutes from './routes/jobRoutes';
+import internshipRoutes from './routes/internshipRoutes';
+import jobApplicationRoutes from './routes/jobApplicationRoutes';
+import notificationRoutes from './routes/notificationRoutes';
+import disputeRoutes from './routes/disputeRoutes';
+import categoryRoutes from './routes/categoryRoutes';
+
+
+const app = express();
+
+app.use(cors({ origin: ENV.FRONTEND_URL }));
+app.use(clerkMiddleware())
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.get("/", (req, res) => {
+    res.json({
+        message: "Welcome to Rester API",
+        endpoints: {
+            users: "/api/users",
+            products: "/api/gigs",
+            comments: "/api/comments"
+        },
+    })
+});
+
+app.use("/api/users", userRoutes);
+app.use("/api/gigs", gigRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/conversations", conversationRoutes);
+app.use("/api/messages", messageRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/subscriptions", subscriptionRoutes);
+app.use("/api/jobs", jobRoutes);
+app.use("/api/internships", internshipRoutes);
+app.use("/api/jobApplications", jobApplicationRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/disputes", disputeRoutes);
+app.use("/api/categories", categoryRoutes);
+
+app.listen(ENV.PORT, () => console.log(`Server is running on PORT ${ENV.PORT}`));
