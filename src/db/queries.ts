@@ -16,6 +16,8 @@ import {
     notifications,
     disputes,
     categories,
+    promotions,
+    verifications,
     type NewUser,
     type NewGig,
     type NewOrder,
@@ -31,6 +33,8 @@ import {
     type NewNotification,
     type NewDispute,
     type NewCategory,
+    type NewVerification,
+    type NewPromotion,
 } from "./schema";
 
 // USERS
@@ -432,6 +436,75 @@ export const updateSubscription = async (id: string, data: Partial<NewSubscripti
     const [subscription] = await db.update(subscriptions).set(data).where(eq(subscriptions.id, id)).returning();
     return subscription;
 };
+
+export const updateSubscriptionStatus = async (
+    id: string,
+    status: "active" | "cancelled" | "expired"
+) => {
+    const [subscription] = await db.update(subscriptions)
+        .set({ status })
+        .where(eq(subscriptions.id, id))
+        .returning()
+    return subscription
+};
+
+// VERIFICATION QUERIES
+export const createVerification = async (data: NewVerification) => {
+    const [ver] = await db.insert(verifications).values(data).returning()
+    return ver
+}
+
+export const getVerificationByUser = async (userId: string) => {
+    return db.query.verifications.findFirst({
+        where: and(
+            eq(verifications.userId, userId),
+            eq(verifications.status, "active")
+        )
+    })
+}
+
+export const updateVerificationStatus = async (
+    id: string,
+    status: "pending" | "active" | "expired"
+) => {
+    const [ver] = await db.update(verifications)
+        .set({ status })
+        .where(eq(verifications.id, id))
+        .returning()
+    return ver
+}
+
+// PROMOTION QUERIES
+export const createPromotion = async (data: NewPromotion) => {
+    const [promo] = await db.insert(promotions).values(data).returning()
+    return promo
+}
+
+export const getPromotionById = async (id: string) => {
+    return db.query.promotions.findFirst({
+        where: eq(promotions.id, id)
+    })
+}
+
+export const getActivePromotions = async (type: "job" | "internship") => {
+    return db.query.promotions.findMany({
+        where: and(
+            eq(promotions.type, type),
+            eq(promotions.status, "active")
+        )
+    })
+}
+
+export const updatePromotionStatus = async (
+    id: string,
+    status: "pending" | "active" | "expired"
+) => {
+    const [promo] = await db.update(promotions)
+        .set({ status })
+        .where(eq(promotions.id, id))
+        .returning()
+    return promo
+}
 
 export const cancelSubscription = async (id: string) => {
     const existingSubscription = await getSubscriptionByUser(id)

@@ -46,6 +46,19 @@ export const jobStatusEnum = pgEnum("jobStatusEnum", [
     "rejected"
 ]);
 
+// ADD THESE with other enums at the top of schema.ts:
+export const verificationStatusEnum = pgEnum("verificationStatus", [
+    "pending",
+    "active",
+    "expired"
+])
+
+export const promotionStatusEnum = pgEnum("promotionStatus", [
+    "pending",
+    "active",
+    "expired"
+])
+
 export const notificationTypeEnum = pgEnum("notificationTypeEnum", [
     "order",
     "message",
@@ -58,6 +71,16 @@ export const disputesStatusEnum = pgEnum("disputesStatusEnum", [
     "reviewing",
     "resolved"
 ]);
+
+export const subscriptionPlanEnum = pgEnum("subscriptionPlanEnum", [
+    "pro",
+    "business"
+])
+
+export const promotionTypeEnum = pgEnum("promotionTypeEnum", [
+    "job",
+    "internship"
+])
 
 export const payoutStatusEnum = pgEnum("payoutStatusEnum", [
     "pending",
@@ -182,14 +205,40 @@ export const payouts = pgTable("payouts", {
 export const subscriptions = pgTable("subscriptions", {
     id: uuid("id").primaryKey().defaultRandom(),
     userId: text("user_id").notNull().references(() => users.id),
-    plan: planEnum("plan").default("personal"),
-    price: decimal("price", { precision: 10, scale: 2 }).notNull().default("0"),
+    plan: subscriptionPlanEnum("plan").notNull(),
     status: planStatusEnum("status").default("active"),
-    startDate: timestamp("start_date", { mode: "date" }).notNull().defaultNow(),
-    endDate: timestamp("end_date", { mode: "date" }),
+    amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
     payHereRef: text("payhere_ref"),
-    createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
+    startDate: timestamp("start_date").defaultNow(),
+    endDate: timestamp("end_date").notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// VERIFICATION
+export const verifications = pgTable("verifications", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull().references(() => users.id),
+    status: verificationStatusEnum("status").default("pending"),
+    amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+    payHereRef: text("payhere_ref"),
+    startDate: timestamp("start_date").defaultNow(),
+    endDate: timestamp("end_date").notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+});
+
+// PROMOTION
+export const promotions = pgTable("promotions", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull().references(() => users.id),
+    type: promotionTypeEnum("type").notNull(),
+    referenceId: text("reference_id").notNull(),
+    amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+    payHereRef: text("payhere_ref"),
+    status: promotionStatusEnum("status").default("pending"),
+    startDate: timestamp("start_date").defaultNow(),
+    endDate: timestamp("end_date").notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const jobs = pgTable("jobs", {
@@ -279,6 +328,9 @@ export const usersRelations = relations(users, ({ many }) => ({
     conversations: many(conversations),
     messages: many(messages),
     payments: many(payments),
+    verifications: many(verifications),
+    promotions: many(promotions),
+    payouts: many(payouts),
     subscriptions: many(subscriptions),
     jobs: many(jobs),
     internships: many(internships),
@@ -393,6 +445,20 @@ export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
     }),
 }));
 
+export const verificationsRelations = relations(verifications, ({ one }) => ({
+    user: one(users, {
+        fields: [verifications.userId],
+        references: [users.id],
+    }),
+}));
+
+export const promotionsRelations = relations(promotions, ({ one }) => ({
+    user: one(users, {
+        fields: [promotions.userId],
+        references: [users.id],
+    }),
+}));
+
 export const jobsRelations = relations(jobs, ({ one, many }) => ({
     postedBy: one(users, {
         fields: [jobs.postedBy],
@@ -467,6 +533,12 @@ export type NewPayout = typeof payouts.$inferInsert
 
 export type Subscription = typeof subscriptions.$inferSelect
 export type NewSubscription = typeof subscriptions.$inferInsert
+
+export type Verification = typeof verifications.$inferSelect
+export type NewVerification = typeof verifications.$inferInsert
+
+export type Promotion = typeof promotions.$inferSelect
+export type NewPromotion = typeof promotions.$inferInsert
 
 export type Job = typeof jobs.$inferSelect
 export type NewJob = typeof jobs.$inferInsert
