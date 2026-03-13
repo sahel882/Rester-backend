@@ -4,7 +4,7 @@ import { createCategory, deleteCategory, getAllCategories, getCategoryById, getC
 
 const router = Router();
 
-router.post("/", createCategory);
+router.post("/", requireAuth(), createCategory);
 
 router.get("/", getAllCategories);
 

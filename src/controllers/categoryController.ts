@@ -4,10 +4,10 @@ import { getAuth } from "@clerk/express";
 
 export async function createCategory(req: Request, res: Response) {
     try {
-        // const { userId } = getAuth(req);
-        // if (!userId) {
-        //     return res.status(401).json({ error: "Unauthorized" });
-        // }
+        const { userId } = getAuth(req);
+        if (!userId) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
 
         const { id, name, slug, icon, description } = req.body;
 
