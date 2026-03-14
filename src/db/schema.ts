@@ -192,6 +192,13 @@ export const payments = pgTable("payments", {
     updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 });
 
+export const follows = pgTable("follows", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    followerId: text("follower_id").notNull().references(() => users.id),
+    followingId: text("following_id").notNull().references(() => users.id),
+    createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const payouts = pgTable("payouts", {
     id: uuid("id").primaryKey().defaultRandom(),
     userId: text("user_id").notNull().references(() => users.id),
@@ -405,6 +412,11 @@ export const conversationsRelations = relations(conversations, ({ one, many }) =
     messages: many(messages),
 }));
 
+export const followsRelations = relations(follows, ({ one }) => ({
+    follower: one(users, { fields: [follows.followerId], references: [users.id] }),
+    following: one(users, { fields: [follows.followingId], references: [users.id] }),
+}))
+
 export const messagesRelations = relations(messages, ({ one }) => ({
     conversation: one(conversations, {
         fields: [messages.conversationId],
@@ -526,6 +538,9 @@ export type NewConversation = typeof conversations.$inferInsert
 
 export type Message = typeof messages.$inferSelect
 export type NewMessage = typeof messages.$inferInsert
+
+export type Follow = typeof follows.$inferSelect
+export type NewFollow = typeof follows.$inferInsert
 
 export type Payment = typeof payments.$inferSelect
 export type NewPayment = typeof payments.$inferInsert

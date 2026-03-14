@@ -1,5 +1,5 @@
 import { db } from "./index";
-import { eq, lte, and, sql } from "drizzle-orm";
+import { eq, lte, and, sql, count } from "drizzle-orm";
 import {
     users,
     gigs,
@@ -18,6 +18,7 @@ import {
     categories,
     promotions,
     verifications,
+    follows,
     type NewUser,
     type NewGig,
     type NewOrder,
@@ -35,6 +36,7 @@ import {
     type NewCategory,
     type NewVerification,
     type NewPromotion,
+    type NewFollow
 } from "./schema";
 
 // USERS
@@ -224,6 +226,43 @@ export const approveOrder = async (id: string) => {
     return orderCompleted;
 };
 
+// FOLLOW QUERIES
+export const followUser = async (followerId: string, followingId: string) => {
+    const result = await db.insert(follows).values({ followerId, followingId }).returning()
+    return result[0]
+}
+
+export const unfollowUser = async (followerId: string, followingId: string) => {
+    return await db.delete(follows)
+        .where(and(eq(follows.followerId, followerId), eq(follows.followingId, followingId)))
+}
+
+export const getFollowers = async (userId: string) => {
+    return await db.query.follows.findMany({
+        where: eq(follows.followingId, userId),
+        with: { follower: true }
+    })
+}
+
+export const getFollowing = async (userId: string) => {
+    return await db.query.follows.findMany({
+        where: eq(follows.followerId, userId),
+        with: { following: true }
+    })
+}
+
+export const getFollowCounts = async (userId: string) => {
+    const followers = await db.select({ count: count() })
+        .from(follows)
+        .where(eq(follows.followingId, userId))
+    const following = await db.select({ count: count() })
+        .from(follows)
+        .where(eq(follows.followerId, userId))
+    return {
+        followers: followers[0].count,
+        following: following[0].count
+    }
+}
 
 // Review
 export const createReview = async (data: NewReview) => {

@@ -16,6 +16,7 @@ import jobApplicationRoutes from './routes/jobApplicationRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import disputeRoutes from './routes/disputeRoutes';
 import categoryRoutes from './routes/categoryRoutes';
+import followRoutes from "./routes/followRoutes";
 import { generalLimiter, paymentLimiter } from "./middleware/rateLimiter";
 
 const app = express();
@@ -46,6 +47,7 @@ app.use("/api/conversations", conversationRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/payments", paymentLimiter);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/follows", followRoutes)
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/internships", internshipRoutes);
