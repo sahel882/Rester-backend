@@ -95,6 +95,8 @@ export const users = pgTable("users", {
     imageUrl: text("image_url"),
     role: roleEnum("role").default("client"),
     bio: text("bio"),
+    jobTitle: text("job_title"),
+    experience: text("experience"),
     skill: text("skill"),
     country: text("country"),
     plan: text("plan").default("free"),

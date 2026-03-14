@@ -70,7 +70,7 @@ export async function updateUser(req: Request, res: Response) {
         if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
         const { id } = req.params as { id: string };
-        const { email, name, imageUrl, role, bio, skill, country } = req.body;
+        const { email, name, imageUrl, role, bio, skill, country, jobTitle, experience } = req.body;
 
         const existingUser = await queries.getUserById(id);
 
@@ -90,7 +90,9 @@ export async function updateUser(req: Request, res: Response) {
             role,
             bio,
             skill,
-            country
+            country,
+            jobTitle,
+            experience
         });
 
         return res.status(200).json(user);
