@@ -10,7 +10,7 @@ router.get("/:id", getUserById);
 
 router.get("/email/:email", getUserByEmail);
 
-router.put("/:id", requireAuth(), updateUser);
+router.put("/users/:id", requireAuth(), updateUser);
 
 router.delete("/:id", requireAuth(), deleteUser);
 
