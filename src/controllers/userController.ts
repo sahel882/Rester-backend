@@ -71,7 +71,7 @@ export async function updateUser(req: Request, res: Response) {
         if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
         const { id } = req.params as { id: string };
-        const { email, name, imageUrl, role, bio, skill, country, jobTitle, experience } = req.body;
+        const { email, name, imageUrl, role, bio, skill, country, jobTitle, experience, coverImage } = req.body;
 
         const existingUser = await queries.getUserById(id);
 
@@ -91,6 +91,7 @@ export async function updateUser(req: Request, res: Response) {
             role,
             bio,
             skill,
+            coverImage,
             country,
             jobTitle,
             experience
