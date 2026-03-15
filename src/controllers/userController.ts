@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import * as queries from "../db/queries";
 import { getAuth } from "@clerk/express";
+import { clerkClient } from "@clerk/clerk-sdk-node";
 
 export async function syncUser(req: Request, res: Response) {
     try {
@@ -107,7 +108,7 @@ export async function updateUser(req: Request, res: Response) {
 
 export async function deleteUser(req: Request, res: Response) {
     try {
-        const { userId } = getAuth(req);
+        const { userId } = getAuth(req); // Clerk userId from auth
 
         if (!userId) {
             return res.status(401).json({ error: "Unauthorized" });
@@ -118,20 +119,27 @@ export async function deleteUser(req: Request, res: Response) {
         const existingUser = await queries.getUserById(id);
 
         if (!existingUser) {
-            return res.status(404).json({ error: `User with this id ${id} was not found` })
-        };
+            return res.status(404).json({ error: `User with this id ${id} was not found` });
+        }
 
         if (existingUser.id !== userId) {
             return res
                 .status(403)
-                .json({ error: "You can only delete your own Profile" });
+                .json({ error: "You can only delete your own profile" });
         }
 
         await queries.deleteUser(id);
 
-        res.status(200).json({ message: "User deleted successfully" });
+        try {
+            await clerkClient.users.deleteUser(userId);
+        } catch (clerkError) {
+            console.error("Failed to delete user from Clerk:", clerkError);
+            return res.status(500).json({ error: "User deleted from DB but failed on Clerk" });
+        }
+
+        res.status(200).json({ message: "User deleted successfully from DB and Clerk" });
     } catch (error) {
         console.error("Error while deleting user:", error);
-        return res.status(500).json({ error: "Failed to deleting user" });
+        return res.status(500).json({ error: "Failed to delete user" });
     }
 };
