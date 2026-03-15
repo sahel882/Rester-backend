@@ -93,6 +93,7 @@ export const users = pgTable("users", {
     email: text("email").notNull().unique(),
     name: text("name"),
     imageUrl: text("image_url"),
+    coverImage: text("cover_image"),
     role: roleEnum("role").default("client"),
     bio: text("bio"),
     jobTitle: text("job_title"),
